@@ -14018,12 +14018,13 @@ document.addEventListener('DOMContentLoaded', renderTwwStripePricingTable);
 <style>
 /* Collapsible top navigation only. Does not touch lessons, courses, checkout, Firebase, Stripe, paid access, or homepage content. */
 header .top-nav-toggle{
-  display:none;
+  display:flex;
   width:100%;
   align-items:center;
   justify-content:space-between;
   gap:10px;
   margin-top:12px;
+  margin-bottom:12px;
   border:1px solid rgba(255,213,74,.34);
   background:linear-gradient(180deg, rgba(255,213,74,.18), rgba(255,213,74,.07));
   color:var(--text);
@@ -14035,6 +14036,13 @@ header .top-nav-toggle{
   letter-spacing:.01em;
   cursor:pointer;
   box-shadow:var(--shadow-soft);
+  transition:transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+header .top-nav-toggle:hover{
+  transform:translateY(-1px);
+  border-color:rgba(255,213,74,.52);
+  background:linear-gradient(180deg, rgba(255,213,74,.24), rgba(255,213,74,.09));
 }
 
 header .top-nav-toggle:focus-visible{
@@ -14049,35 +14057,21 @@ header .top-nav-toggle-state{
   letter-spacing:.08em;
 }
 
-@media (max-width:700px){
-  header .top-nav-toggle{
-    display:flex;
-  }
-
-  header .top-nav{
-    overflow:hidden;
-    max-height:900px;
-    opacity:1;
-    transform:translateY(0);
-    transition:max-height .24s ease, opacity .18s ease, transform .18s ease, margin .18s ease;
-  }
-
-  header.tww-top-nav-collapsed .top-nav{
-    max-height:0 !important;
-    opacity:0;
-    transform:translateY(-6px);
-    pointer-events:none;
-    margin-top:0 !important;
-  }
+header .top-nav{
+  overflow:hidden;
+  max-height:900px;
+  opacity:1;
+  transform:translateY(0);
+  transition:max-height .24s ease, opacity .18s ease, transform .18s ease, margin .18s ease;
 }
 
-@media (min-width:701px){
-  header .top-nav{
-    max-height:none !important;
-    opacity:1 !important;
-    transform:none !important;
-    pointer-events:auto !important;
-  }
+header.tww-top-nav-collapsed .top-nav{
+  max-height:0 !important;
+  opacity:0;
+  transform:translateY(-6px);
+  pointer-events:none;
+  margin-top:0 !important;
+  margin-bottom:0 !important;
 }
 </style>
 
@@ -14096,8 +14090,7 @@ header .top-nav-toggle-state{
     if (!header || header.dataset.topNavCollapseReady === '1') return;
 
     var nav = header.querySelector('.top-nav');
-    var brand = header.querySelector('.brand');
-    if (!nav || !brand) return;
+    if (!nav) return;
 
     header.dataset.topNavCollapseReady = '1';
 
@@ -14109,7 +14102,7 @@ header .top-nav-toggle-state{
     toggle.setAttribute('aria-controls', nav.id);
     toggle.innerHTML =
       '<span class="top-nav-toggle-label">Quick Access Menu</span>' +
-      '<span class="top-nav-toggle-state">Show</span>';
+      '<span class="top-nav-toggle-state">Hide</span>';
 
     nav.parentNode.insertBefore(toggle, nav);
 
@@ -14123,30 +14116,39 @@ header .top-nav-toggle-state{
       }
     }
 
+    var savedState = null;
+    try {
+      savedState = window.localStorage.getItem('tww_top_nav_collapsed_all');
+    } catch (error) {}
+
+    var startCollapsed = savedState === '1' || (savedState === null && isMobile());
+
     function applyTopNavState(collapsed){
-      if (!isMobile()) collapsed = false;
       header.classList.toggle('tww-top-nav-collapsed', collapsed);
       toggle.setAttribute('aria-expanded', String(!collapsed));
       toggle.setAttribute('title', collapsed ? 'Show Quick Access Menu' : 'Hide Quick Access Menu');
       if (stateText) stateText.textContent = collapsed ? 'Show' : 'Hide';
     }
 
-    applyTopNavState(isMobile());
+    applyTopNavState(startCollapsed);
 
     toggle.addEventListener('click', function(){
       var nextCollapsed = !header.classList.contains('tww-top-nav-collapsed');
       applyTopNavState(nextCollapsed);
+
+      try {
+        window.localStorage.setItem('tww_top_nav_collapsed_all', nextCollapsed ? '1' : '0');
+      } catch (error) {}
     });
 
     nav.addEventListener('click', function(event){
       var clickedLink = event.target.closest && event.target.closest('a');
       if (clickedLink && isMobile()) {
         applyTopNavState(true);
+        try {
+          window.localStorage.setItem('tww_top_nav_collapsed_all', '1');
+        } catch (error) {}
       }
-    });
-
-    window.addEventListener('resize', function(){
-      applyTopNavState(isMobile() ? header.classList.contains('tww-top-nav-collapsed') : false);
     });
   });
 })();
