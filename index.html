@@ -14014,6 +14014,154 @@ document.addEventListener('DOMContentLoaded', renderTwwStripePricingTable);
   }
 </script>
 <!-- ====================== PAID LESSON ACCESS END ====================== -->
+<!-- ================= QUICK ACCESS COLLAPSE PATCH START ================= -->
+<style>
+/* Collapsible Quick Access only. Does not touch lessons, courses, checkout, Firebase, Stripe, or paid access. */
+#home-platform-access .quick-access-toggle-wrap{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  margin:0 0 12px;
+}
 
+#home-platform-access .quick-access-toggle{
+  display:inline-flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  min-width:170px;
+  border:1px solid rgba(255,213,74,.34);
+  background:linear-gradient(180deg, rgba(255,213,74,.18), rgba(255,213,74,.07));
+  color:var(--text);
+  padding:11px 14px;
+  border-radius:14px;
+  font:inherit;
+  font-size:13px;
+  font-weight:950;
+  letter-spacing:.01em;
+  cursor:pointer;
+  box-shadow:var(--shadow-soft);
+  transition:transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+#home-platform-access .quick-access-toggle:hover{
+  transform:translateY(-1px);
+  border-color:rgba(255,213,74,.52);
+  background:linear-gradient(180deg, rgba(255,213,74,.24), rgba(255,213,74,.09));
+}
+
+#home-platform-access .quick-access-toggle:focus-visible{
+  outline:2px solid rgba(255,213,74,.85);
+  outline-offset:3px;
+}
+
+#home-platform-access .quick-access-toggle-state{
+  color:rgba(255,213,74,.96);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+#home-platform-access .quick-access-grid{
+  overflow:hidden;
+  max-height:2400px;
+  opacity:1;
+  transform:translateY(0);
+  transition:max-height .28s ease, opacity .18s ease, transform .18s ease, margin .18s ease;
+}
+
+#home-platform-access.quick-access-collapsed .quick-access-grid{
+  max-height:0 !important;
+  opacity:0;
+  transform:translateY(-6px);
+  pointer-events:none;
+  margin-top:0 !important;
+  margin-bottom:0 !important;
+}
+
+@media (max-width:700px){
+  #home-platform-access .quick-access-toggle-wrap{
+    justify-content:stretch;
+  }
+
+  #home-platform-access .quick-access-toggle{
+    width:100%;
+  }
+}
+</style>
+
+<script>
+(function initQuickAccessCollapse(){
+  function onReady(fn){
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn);
+    } else {
+      fn();
+    }
+  }
+
+  onReady(function(){
+    var section = document.getElementById('home-platform-access');
+    if (!section || section.dataset.quickAccessCollapseReady === '1') return;
+
+    var grid = section.querySelector('.quick-access-grid');
+    if (!grid) return;
+
+    section.dataset.quickAccessCollapseReady = '1';
+
+    if (!grid.id) grid.id = 'quick-access-grid';
+
+    var toggleWrap = document.createElement('div');
+    toggleWrap.className = 'quick-access-toggle-wrap';
+
+    var toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'quick-access-toggle';
+    toggle.setAttribute('aria-controls', grid.id);
+
+    toggle.innerHTML =
+      '<span class="quick-access-toggle-label">Quick Access</span>' +
+      '<span class="quick-access-toggle-state">Hide</span>';
+
+    toggleWrap.appendChild(toggle);
+    grid.parentNode.insertBefore(toggleWrap, grid);
+
+    var stateText = toggle.querySelector('.quick-access-toggle-state');
+    var isMobile = false;
+
+    try {
+      isMobile = window.matchMedia('(max-width:700px)').matches;
+    } catch (error) {
+      isMobile = window.innerWidth <= 700;
+    }
+
+    var savedState = null;
+    try {
+      savedState = window.localStorage.getItem('tww_quick_access_collapsed');
+    } catch (error) {}
+
+    var startCollapsed = savedState === '1' || (savedState === null && isMobile);
+
+    function applyQuickAccessState(collapsed){
+      section.classList.toggle('quick-access-collapsed', collapsed);
+      toggle.setAttribute('aria-expanded', String(!collapsed));
+      toggle.setAttribute('title', collapsed ? 'Show Quick Access' : 'Hide Quick Access');
+      if (stateText) stateText.textContent = collapsed ? 'Show' : 'Hide';
+    }
+
+    applyQuickAccessState(startCollapsed);
+
+    toggle.addEventListener('click', function(){
+      var nextCollapsed = !section.classList.contains('quick-access-collapsed');
+      applyQuickAccessState(nextCollapsed);
+
+      try {
+        window.localStorage.setItem('tww_quick_access_collapsed', nextCollapsed ? '1' : '0');
+      } catch (error) {}
+    });
+  });
+})();
+</script>
+<!-- ================== QUICK ACCESS COLLAPSE PATCH END ================== -->
 </body>
 </html>
