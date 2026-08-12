@@ -2386,6 +2386,29 @@ html,body{max-width:100%;overflow-x:hidden}
 @media(max-width:620px){.v29-real-life{padding:19px 17px;border-radius:25px}.v29-real-life-head{gap:10px;margin-bottom:14px}.v29-real-life h2{font-size:42px}.v29-real-life-head p{font-size:12.5px;line-height:1.6}.v29-media-grid{gap:10px}.v29-media-side{gap:10px}.v29-media-feature{aspect-ratio:4/4.4}.v29-media-tile{aspect-ratio:4/5}.v29-media-note{font-size:10.5px;display:block}.v29-media-note b{display:block;margin-bottom:3px}}
 </style>
 
+
+<style id="v30-landscape-intro-fix">
+/* V30 — desktop-safe landscape intro player. The portrait source is baked into a 16:9 blurred-background video. */
+.v20-hero .v10-video-stage.v28-real-video-stage{
+  position:relative!important;display:block!important;width:100%!important;max-width:100%!important;
+  min-height:0!important;height:auto!important;padding:0!important;aspect-ratio:16/9!important;
+  overflow:hidden!important;background:#050609!important;border-radius:0 0 28px 28px!important;
+}
+.v20-hero .v10-video-stage.v28-real-video-stage::before,
+.v20-hero .v10-video-stage.v28-real-video-stage::after{display:none!important;content:none!important}
+.v28-intro-video{
+  position:relative!important;z-index:2!important;display:block!important;width:100%!important;height:100%!important;
+  max-width:none!important;max-height:none!important;aspect-ratio:16/9!important;object-fit:cover!important;
+  margin:0!important;border:0!important;border-radius:0!important;background:#050609!important;box-shadow:none!important;
+}
+.v28-video-caption{left:14px!important;bottom:14px!important;z-index:4!important}
+@media(max-width:720px){
+  .v20-hero .v10-video-stage.v28-real-video-stage{aspect-ratio:16/9!important;padding:0!important;border-radius:0 0 19px 19px!important}
+  .v28-intro-video{width:100%!important;height:100%!important;aspect-ratio:16/9!important;object-fit:cover!important}
+  .v28-video-caption{left:12px!important;bottom:10px!important;transform:none!important;font-size:8px!important;padding:7px 9px!important}
+}
+</style>
+
 </head>
 <body>
 <a aria-label="Join the membership now" class="sticky-join-cta" href="#checkout">
